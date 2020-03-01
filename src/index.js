@@ -178,7 +178,7 @@ submit = (event) => {
 //This render simply renders all the process and refined visualizations
   render() {
     return (
-      <div style={{ backgroundColor:"#263238", textAlign: "center" }}>
+      <div style={{height:'100vh', backgroundColor:"#263238", textAlign: "center" }}>
         <div style={{ padding: "1rem 0" }}>
           <button className="btn" onClick={this.changeTurning}>
             {"Toggle Spin"}
