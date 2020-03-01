@@ -19,7 +19,7 @@ import {Motion, spring} from "react-motion";
 import chroma from "chroma-js";
 
 //This contains the Lat/Long data along with Country names and abreveations.
-import geographyObject from "./50m.json";
+import geographyObject from "./50m1.json";
 
 //Reshapes the Mapp size.
 const mapStyles = {
@@ -77,7 +77,7 @@ const Map = ({center, csize, markers, popData, updateCountry}) => (<div>
         }} style={mapStyles}>
         <ZoomableGlobe center={[x, y]}>
           <circle cx={250} cy={250} r={220} fill="transparent" stroke="#CFD8DC"/>
-          <Geographies disableOptimization="disableOptimization" geography={geographyObject}>
+          <Geographies disableOptimization geography={geographyObject}>
             {
               (geos, proj) => geos.map((geo, i) => (
               //updateCountry() send the selected country name and country abreveation
