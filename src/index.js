@@ -33,7 +33,8 @@ class App extends Component {
       text_stub: "",
       abr: "usa",
       date: "",
-      logNum: []
+      logNum: [],
+      reg_flag:true
     };
   }
 
@@ -69,21 +70,14 @@ updateCountry = (country2,abrev) =>{
 }
 
 
-//This function creates the "blurb" of text in the popup that gives a general idea to the user.
-  makeText = () => {
-    var x = "Unable to Determine";
-    if (this.state.api_data[3] === "NF"){
-      x = "Not Free";
-    }
-     if (this.state.api_data[3] === "PF"){
-      x = "Partly Free";
-    }
-     if (this.state.api_data[3] === "F"){
-      x = "Free";
-    }
-    // console.log(this.state.api_data);
-    return this.state.countrylist[0] + " has freedom rating " + this.state.api_data[2] + " and is thus deemed as "  + x + "."+"\n As analyzed using the Grid cell population over 20 years (GeoEconomic Data), the slope very clearly corresponds with the number of refugees per country.";
-  }
+// //This function creates the "blurb" of text in the popup that gives a general idea to the user.
+//   makeText = (edge) => {
+//     if(!edge){
+//       return "There are not enough cases to model the log graph";
+//     }
+//       return "Works";
+//     // console.log(this.state.api_data);
+//   }
 
 // function that determines what dataset or color scheme the user would like(see map.js)
   changeData = () => {
@@ -111,26 +105,31 @@ updateCountry = (country2,abrev) =>{
 //and individualized projected geogrpahical data, we preprocess all the responses for visualization
 // and set action-determining states accodingly.
   async post(){
-    const test = await axios.put(" http://8a9e5d97.ngrok.io/",{"list" : [this.state.countrylist],"date":[this.state.date]}).then(async(response) =>{
+    const test = await axios.put("http://8a9e5d97.ngrok.io/",{"list" : [this.state.countrylist],"date":[this.state.date]}).then(async(response) =>{
 
-      // this.setState({api_data: response["data"]["output"]});
+      this.setState({api_data: response["data"]["output"]});
 
       this.setState({years: response["data"]["output"][1]});
       this.setState({caseCount: response["data"]["output"][2]});
+      this.setState({reg_flag: response["data"]["output"][6]});
+      if(response["data"]["output"][this.state.api_data.length-1]){
+        this.setState({text_stub : "The point of maximum risk is " +response["data"]["output"][5] +", where the growth rate for the disease is the highest. Please be careful if you’re traveling here around this time. Ensure proper safety and contact your local CDC as necessary."});
+      } else{
+        this.setState({text_stub : "There are not enough cases to model accurately"});
+
+      }
+
       this.setState({logNum: response["data"]["output"][3]});
-
-      // this.setState({text_stub : this.makeText()});
-
       var graph1 = [];
       for (var x = 0; x <response["data"]["output"][1].length; x++) {
             graph1.push({  years: this.state.years[x],
                            caseCount: this.state.caseCount[x],
                            logNum: this.state.logNum[x]});
         }
+    //  this.setState({text_stub : this.makeText()});
       this.setState({graph: graph1});
       this.setState({showMap: true});
       this.setState({ open: true });
-
     }).catch(error => {
 alert(error);
     });
@@ -163,7 +162,9 @@ alert(error);
 
 
 myDateHandler = (event) => {
-  this.setState({date: event.target.value});
+  // this.setState({date: event.target.value});
+  this.setState({date: "03/01/20"});
+
 };
 // SIDE NOTE: the coordinate system of this globe is E, N, not the conventional N,E. - denotates south or west.
 
@@ -203,7 +204,8 @@ myDateHandler = (event) => {
               dat ={this.state.graph}
               blurb = {this.state.text_stub}
               country = {this.state.countrylist[0]}
-              abrev = {this.state.abr}/>
+              abrev = {this.state.abr}
+              reg_fl = {this.state.reg_flag}/>
           </Popup>
 
       </div>

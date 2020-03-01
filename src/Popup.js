@@ -42,10 +42,11 @@ class ControlledPopup extends React.Component {
           <CartesianGrid stroke="#000000" strokeDasharray="3 3"/>
           <Tooltip/>
           <Legend/>
-          <Line type="monotone" dataKey="caseCount" stroke="#8884d8" activeDot={{
-              r: 4
-            }}/>
-          <Line type="monotone" dataKey="logNum" stroke="#82ca9d" dot={false}/>
+          <Line type="monotone" dataKey="caseCount" strokeWidth={this.props.reg_fl ? 0:2} stroke= {this.props.reg_fl ? "#8884d8":"#8884d8"} dot={{fill: this.props.reg_fl ? '#8884d8':'#8884d8'}} activeDot={{
+                fill: this.props.reg_fl ? "#8884d8":"#8884d8",
+                r: 6
+              }}/>
+          <Line type="monotone" dataKey="logNum" strokeWidth={3} stroke="#82ca9d" dot={false}/>
         </LineChart>
       </div>
       <div>
