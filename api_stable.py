@@ -1,6 +1,9 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
+from scipy.optimize import curve_fit
+from datetime import *
+import numpy as np
 import pandas as pd
 import ast
 
@@ -11,7 +14,7 @@ api = Api(app)
 notes = {}
 
 df = pd.read_csv("time_series_19-covid-Confirmed.csv", header=0)
-
+x_val = 0;
 countries = df['Country/Region'].unique()
 #print(countries)
 dictOfCountries = {}
@@ -74,15 +77,64 @@ class Test(Resource):
         # print(listCountriesSum[testin].values.tolist()[0][1:])
         name =listCountriesSum[testin].values.tolist()[0][:1][0]
         vals = listCountriesSum[testin].values.tolist()[0][1:]
-        poi = 0
+        if(vals[10]-vals[0]<10):
+          dates = dates[13:]
+          vals = vals[13:]
+
+        def sigmoid(x, L ,x0, k, b):
+            y = L / (1 + np.exp(-k*(x-x0)))+b
+            return y
+
+        p0 = [max(vals), np.median(dates),1,min(vals)] # this is an mandatory initial guess
+        try:
+          popt, pcov = curve_fit(sigmoid, dates,vals,p0, method='dogbox',maxfev=5000)
+        except RuntimeError:
+          try:
+            popt, pcov = curve_fit(sigmoid, dates,vals,p0, method='dogbox',maxfev=10000)
+          except RuntimeError:
+            try:
+              popt, pcov = curve_fit(sigmoid, dates,vals,p0, method='dogbox',maxfev=50000)
+            except:
+              popt, pcov = curve_fit(sigmoid, dates,vals,p0, method='dogbox',maxfev=100000)
+
+        approx_vals = sigmoid(dates, *popt)
+        inflection_pt = round(popt[0] / (1+np.exp(-popt[2]*(900-popt[1]))) + popt[3])/2
+        print(inflection_pt)
+        # x = (np.log((-popt[0]/(popt[3]-inflection_pt)) + 1))/(-popt[2]) + popt[1]
+        x_val = - (np.log((inflection_pt-popt[0]-popt[3])/(popt[3]-inflection_pt))/popt[0]) + popt[1]
+        print(x_val)
+
+        poi = inflection_pt
         # fi_data = [aggr,stat]
-        data = [name,dates, vals, poi]
+        dates1 = date(2020,1,22) + timedelta(days=x_val)
+        # print(len(approx_vals.tolist())==len(vals))
+        data = [name,dates, vals,approx_vals.tolist(), poi,str(dates1)]
         # data = [X,values]
         # data = [args.list[0]]
         print(data)
         z = {'output': data} # Formatting this is important. If you don't format it right,
         return z                                              # React won't get anything/ won't be able to index it.
 
+    def push(self):
+            parser = reqparse.RequestParser()
+            parser.add_argument('list', action='append')
+
+            args = parser.parse_args()
+            print(args.list)
+            args.list = ast.literal_eval(args.list[0])
+            print(args.list)
+            date_str = args.list[0]
+            mt = int(date_str[:2])
+            dy = int(date_str[3:4])
+            yr = 2000 + int(date_str[6:])
+            d0 = date(yr, mt, dy)
+
+            d2 = date(2020,1,22) + timedelta(days=x_val)
+            print(d2)
+            # d1 = date(2020, 2, 12)
+            delta = d2 - d0
+            severity = 100-delta.days
+            print("Severity", severity)
 
 api.add_resource(Test, '/')
 
