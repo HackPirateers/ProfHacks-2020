@@ -10,7 +10,31 @@ api = Api(app)
 
 notes = {}
 
+df = pd.read_csv("time_series_19-covid-Confirmed.csv", header=0)
+
+countries = df['Country/Region'].unique()
+#print(countries)
+dictOfCountries = {}
+#dictOfCountries = {i : countries[i] for i in range(0, len(countries))}
+for i in range(0, len(countries)):
+     dictOfCountries[countries[i]] = i
+print(dictOfCountries)
+
+
+listCountries = []
+listCountriesSum = []
+for i in range(0, len(countries)):
+    temp = df[(df['Country/Region'] == countries[i])].drop(['Lat','Long'],axis=1)
+    listCountries.append(temp)
+
+    listCountriesSum.append(temp.sum(numeric_only=True).to_frame().T)
+    listCountriesSum[i].insert(0, 'Country', [countries[i]], True)
+
+print(listCountriesSum[25])
 class Test(Resource):
+
+
+
     def put(self):
 
         # Parsing. View docs(https://flask-restful.readthedocs.io/en/latest/) if this isn't what you need.
@@ -25,48 +49,37 @@ class Test(Resource):
 
         args = parser.parse_args()
         print(args.list)
+        #@TODO Have to map contry name given by react to country name on dataset
+        #Also have to map that to an index to parse to proper set using dictionary
+        print("SFSDGSDf")
         args.list = ast.literal_eval(args.list[0])
         print(args.list)
-        df = pd.read_csv("aslyum_by_country_origin2.csv")
-        # fi = pd.read_csv()
-        fi = pd.read_csv("Subcategory_Scores_FIW2017.csv")
 
 
-        df = df[['cartodb_id', 'name', 'country_or', 'yr_2000',
-               'yr_2001', 'yr_2002', 'yr_2003', 'yr_2004', 'yr_2005', 'yr_2006','yr_2007',
-               'yr_2008', 'yr_2009', 'yr_2010', 'yr_2011', 'yr_2012', 'yr_2013',
-               'yr_2014', 'yr_2015', 'yr_2016', 'yr_2017']]
-        df.set_index("cartodb_id")
+        #     new_row = pd.DataFrame({"Country": countries[i]}, index=[0])
+        #   listCountriesSum[i] = pd.concat([new_row, listCountriesSum[i]])
 
+        #print(listCountries[0])
+        #print(type(listCountriesSum[0]))
+        #change inddex for country
+        testin = dictOfCountries.get(args.list[1])
+        # print(listCountriesSum[testin])
+        # print(range(1, len(listCountriesSum[testin].columns)))
 
-        df = df.T.fillna(df.mean(axis=1)).T
-        if df['name'].str.contains(args.list[0]).any():
-            x = df.loc[df["name"]==args.list[0]]
-            print("name")
-        elif df['country_or'].str.contains(args.list[0]).any():
-            x = df.loc[df["country_or"]==args.list[0]]
-            print("or")
-        #x = df.loc[df["name"]==args.list[0]]
-        # x = x.iloc[0]
-        print(x)
-        values = x.values.tolist()
-        print("VALUES--->",values)
-        values = values[0][3:]
-        print("VALUES 2.0 --->",values)
-
-        # X,y, year_subtract = preprocess(df, ccode1, ccode2)
-        # years, totals = regression(X, y,year_su
-        # btract)
-        X = list(range(2000,2017))
-        country_data = fi.loc[fi["Country"]==args.list[0]]
-        aggr = country_data["Total Aggr"]
-        aggr = int(aggr)
-        stat = country_data["Status"]
-        stat = stat.iloc[0]
+        print(listCountriesSum[testin])
+        dates = list(range(1, len(listCountriesSum[testin].columns)))
+        # print(dates)
+        # print(listCountriesSum[testin].values.tolist()[0])
+        # print(listCountriesSum[testin].values.tolist()[0][:1][0])
+        # print(listCountriesSum[testin].values.tolist()[0][1:])
+        name =listCountriesSum[testin].values.tolist()[0][:1][0]
+        vals = listCountriesSum[testin].values.tolist()[0][1:]
+        poi = 0
         # fi_data = [aggr,stat]
-        data = [X,values, aggr, stat]
+        data = [name,dates, vals, poi]
         # data = [X,values]
         # data = [args.list[0]]
+        print(data)
         z = {'output': data} # Formatting this is important. If you don't format it right,
         return z                                              # React won't get anything/ won't be able to index it.
 
