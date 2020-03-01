@@ -9,6 +9,7 @@ import Map from "./Map";
 import axios from "axios";
 import "./styles.css";
 import ControlledPopup from "./Popup.js";
+import ControlledPopup1 from "./Popup1.js";
 import Recharts from "recharts";
 import Popup from "reactjs-popup";
 
@@ -34,7 +35,8 @@ class App extends Component {
       abr: "usa",
       date: "",
       logNum: [],
-      reg_flag:true
+      reg_flag:true,
+      submit:false
     };
   }
 
@@ -166,12 +168,17 @@ myDateHandler = (event) => {
   this.setState({date: "03/01/20"});
 
 };
+
+submit = (event) => {
+  alert("holla");
+  this.setState({submit:true});
+}
 // SIDE NOTE: the coordinate system of this globe is E, N, not the conventional N,E. - denotates south or west.
 
 //This render simply renders all the process and refined visualizations
   render() {
     return (
-      <div style={{ textAlign: "center" }}>
+      <div style={{ backgroundColor:"#263238", textAlign: "center" }}>
         <div style={{ padding: "1rem 0" }}>
           <button className="btn" onClick={this.changeTurning}>
             {"Toggle Spin"}
@@ -180,13 +187,7 @@ myDateHandler = (event) => {
   {"Toggle Data"}
 </button>
         </div>
-        <form>
-           <p> Enter your Date: </p>
-           <input
-             type='text'
-             onChange={this.myDateHandler}
-           />
-           </form>
+
         <Map
           center={this.state.center}
           csize={this.state.size}
@@ -200,15 +201,22 @@ myDateHandler = (event) => {
             onClose={this.closeModal}
             contentStyle = {{background: "#FFFFFF"}}
           >
-            <ControlledPopup
-              dat ={this.state.graph}
-              blurb = {this.state.text_stub}
-              country = {this.state.countrylist[0]}
-              abrev = {this.state.abr}
-              reg_fl = {this.state.reg_flag}/>
-          </Popup>
 
-      </div>
+          {this.state.submit? <ControlledPopup
+                       dat ={this.state.graph}
+                       blurb = {this.state.text_stub}
+                       country = {this.state.countrylist[0]}
+                       abrev = {this.state.abr}
+                       reg_fl = {this.state.reg_flag}/> :   <ControlledPopup1
+                           myDateHandler={this.myDateHandler}
+                           submit={this.submit}
+                         />}
+
+
+
+
+                   </Popup>
+       </div>
     );
   }
 }
