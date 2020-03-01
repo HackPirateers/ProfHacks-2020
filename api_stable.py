@@ -82,6 +82,10 @@ class Test(Resource):
         # print(listCountriesSum[testin].values.tolist()[0][1:])
         name =listCountriesSum[testin].values.tolist()[0][:1][0]
         vals = listCountriesSum[testin].values.tolist()[0][1:]
+        if(vals[-1]-vals[0]<5):
+            data999 = [name,dates, vals,[], 0 , " ", False]
+            x = {'output': data999}
+            return x
         if(vals[10]-vals[0]<10):
           dates = dates[13:]
           vals = vals[13:]
@@ -111,9 +115,10 @@ class Test(Resource):
 
         poi = inflection_pt
         # fi_data = [aggr,stat]
+        print(x_val)
         dates1 = date(2020,1,22) + timedelta(days=x_val)
         # print(len(approx_vals.tolist())==len(vals))
-        data = [name,dates, vals,approx_vals.tolist(), poi,str(dates1)]
+        data = [name,dates, vals,approx_vals.tolist(), poi,str(dates1), True]
         # data = [X,values]
         # data = [args.list[0]]
         print(data)
