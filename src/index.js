@@ -24,15 +24,16 @@ class App extends Component {
       open: false,
       graph: [],
       years: [],
-      refCount: [],
-      open: false,
+      caseCount: [],
       center: [0, 0],
       size: 5,
-      turn: 1,
+      turn: 0,
       popData: false,
       api_data: [],
       text_stub: "",
-      abr: "usa"
+      abr: "usa",
+      date: "",
+      logNum: []
     };
   }
 
@@ -54,18 +55,19 @@ class App extends Component {
 
 // the function used to handle a click on a country in the globe.
 // This function pushes data to state space and calls post function.
-  updateCountry = (country1,country2,abrev) =>{
+updateCountry = (country2,abrev) =>{
 
-    this.setState({
-      countrylist: [country1, country2],
-      abr:abrev.toString().toLowerCase(),
-    }, function(){
-      console.log(this.state.abr);
-      // console.log(this.post);
-      this.post();
+  this.setState({
+    countrylist: [country2],
+    abr:abrev.toString().toLowerCase(),
+  }, function(){
+    console.log(this.state.abr);
+    // console.log(this.post);
+    this.post();
 
-    });
-  }
+  });
+}
+
 
 //This function creates the "blurb" of text in the popup that gives a general idea to the user.
   makeText = () => {
@@ -109,18 +111,21 @@ class App extends Component {
 //and individualized projected geogrpahical data, we preprocess all the responses for visualization
 // and set action-determining states accodingly.
   async post(){
-    const test = await axios.put("http://127.0.0.1:5000/",{"list" : [this.state.countrylist]}).then(async(response) =>{
+    const test = await axios.put(" http://8a9e5d97.ngrok.io/",{"list" : [this.state.countrylist],"date":[this.state.date]}).then(async(response) =>{
 
-      this.setState({api_data: response["data"]["output"]});
-      this.setState({years: response["data"]["output"][0]});
-      this.setState({refCount: response["data"]["output"][1]});
-      //this.setState({showMap : true});
-      this.setState({text_stub : this.makeText()});
+      // this.setState({api_data: response["data"]["output"]});
+
+      this.setState({years: response["data"]["output"][1]});
+      this.setState({caseCount: response["data"]["output"][2]});
+      this.setState({logNum: response["data"]["output"][3]});
+
+      // this.setState({text_stub : this.makeText()});
 
       var graph1 = [];
-      for (var x = 0; x <response["data"]["output"][0].length; x++) {
+      for (var x = 0; x <response["data"]["output"][1].length; x++) {
             graph1.push({  years: this.state.years[x],
-                           refCount: this.state.refCount[x]});
+                           caseCount: this.state.caseCount[x],
+                           logNum: this.state.logNum[x]});
         }
       this.setState({graph: graph1});
       this.setState({showMap: true});
@@ -156,6 +161,10 @@ alert(error);
     clearInterval(this.interval);
   }
 
+
+myDateHandler = (event) => {
+  this.setState({date: event.target.value});
+};
 // SIDE NOTE: the coordinate system of this globe is E, N, not the conventional N,E. - denotates south or west.
 
 //This render simply renders all the process and refined visualizations
@@ -170,6 +179,13 @@ alert(error);
   {"Toggle Data"}
 </button>
         </div>
+        <form>
+           <p> Enter your Date: </p>
+           <input
+             type='text'
+             onChange={this.myDateHandler}
+           />
+           </form>
         <Map
           center={this.state.center}
           csize={this.state.size}
@@ -181,7 +197,7 @@ alert(error);
             open={this.state.open}
             closeOnDocumentClick
             onClose={this.closeModal}
-            contentStyle = {{background: "#D3D3D3"}}
+            contentStyle = {{background: "#FFFFFF"}}
           >
             <ControlledPopup
               dat ={this.state.graph}

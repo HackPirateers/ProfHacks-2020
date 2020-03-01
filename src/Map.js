@@ -59,7 +59,7 @@ const subregions = [
 ];
 
 //This is the Map const value which contains the main JSX code for the globe.
-const Map = ({center, csize, markers, popData, updateCountry}) => (<div>
+const Map = ({center, csize, markers, popData, updateCountry, myGenderHandler, myAgeHandler}) => (<div>
   {/* //This controls the spinning motion of the globe. */}
 
   <Motion defaultStyle={{
@@ -77,11 +77,11 @@ const Map = ({center, csize, markers, popData, updateCountry}) => (<div>
         }} style={mapStyles}>
         <ZoomableGlobe center={[x, y]}>
           <circle cx={250} cy={250} r={220} fill="transparent" stroke="#CFD8DC"/>
-          <Geographies disableOptimization geography={geographyObject}>
+          <Geographies disableOptimization="disableOptimization" geography={geographyObject}>
             {
               (geos, proj) => geos.map((geo, i) => (
               //updateCountry() send the selected country name and country abreveation
-              <Geography key={geo.id + i} geography={geo} projection={proj} onClick={() => updateCountry(geo.properties.sovereignt, geo.properties.brk_name, geo.properties.adm0_a3)} style={{
+              <Geography key={geo.id + i} geography={geo} projection={proj} onClick={() => updateCountry(geo.properties.brk_name, geo.properties.adm0_a3)} style={{
                   default: {
                     fill: popData
                       ? "#CFD8DC"
@@ -98,6 +98,7 @@ const Map = ({center, csize, markers, popData, updateCountry}) => (<div>
       </ComposableMap>)
     }
   </Motion>
+
 </div>);
 
 export default Map;
