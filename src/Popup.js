@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 //This is the module we used to create the Linechart.
 import {
   LineChart,
+  ResponsiveContainer,
   Line,
   XAxis,
   YAxis,
@@ -30,10 +31,11 @@ class ControlledPopup extends React.Component {
           &times;
         </a>
         {/* //This is the Linechart, in data={}, this is where we put in the array */}
-        <LineChart width={750} height={350} data={this.props.dat} margin={{
+        <ResponsiveContainer width={550} height={350}>
+        <LineChart data={this.props.dat} margin={{
             top: 5,
-            right: 20,
-            left: 20,
+            right: 5,
+            left: 5,
             bottom: 5
           }}>
             //This is adjusting the axis on the graph.
@@ -48,6 +50,7 @@ class ControlledPopup extends React.Component {
               }}/>
           <Line type="monotone" dataKey="logNum" strokeWidth={3} stroke="#82ca9d" dot={false}/>
         </LineChart>
+        </ResponsiveContainer>
       </div>
       <div>
         {/* //This includes the blurb for a person twist */}

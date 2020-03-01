@@ -35,23 +35,23 @@ const subregions = [
   "Southern Asia",
   "Polynesia",
   "Micronesia",
-  "Southern Africa",
+  // "Southern Africa",
   "Central Asia",
   "Melanesia",
   "Western Europe",
   "Central America",
   "Seven seas (open ocean)",
-  "Northern Africa",
+  // "Northern Africa",
   "Caribbean",
   "South-Eastern Asia",
-  "Eastern Africa",
+  // "Eastern Africa",
   "Australia and New Zealand",
   "Eastern Europe",
-  "Western Africa",
+  // "Western Africa",
   "Southern Europe",
   "Eastern Asia",
   "South America",
-  "Middle Africa",
+  // "Middle Africa",
   "Antarctica",
   "Northern Europe",
   "Northern America",
@@ -76,16 +76,17 @@ const Map = ({center, csize, markers, popData, updateCountry, myGenderHandler, m
           scale: 220
         }} style={mapStyles}>
         <ZoomableGlobe center={[x, y]}>
-          <circle cx={250} cy={250} r={220} fill="transparent" stroke="#CFD8DC"/>
+          <circle cx={250} cy={250} r={220} fill="#546e7a" stroke="#546e7a"/>
           <Geographies disableOptimization="disableOptimization" geography={geographyObject}>
             {
               (geos, proj) => geos.map((geo, i) => (
               //updateCountry() send the selected country name and country abreveation
               <Geography key={geo.id + i} geography={geo} projection={proj} onClick={() => updateCountry(geo.properties.brk_name, geo.properties.adm0_a3)} style={{
                   default: {
-                    fill: popData
-                      ? "#CFD8DC"
-                      : colorScale[subregions.indexOf(geo.properties.subregion)],
+                    fill: geo.properties.subregion.includes("Africa")
+                      ? "#C0C0C0"
+                      :colorScale[subregions.indexOf(geo.properties.subregion)],
+                      // : geo.properties.brk_name.includes("India") ? "#8BC34A":  geo.properties.brk_name.includes("China") ? "#F44336":colorScale[subregions.indexOf(geo.properties.subregion)],
                     stroke: "#607D8B",
                     strokeWidth: 0.75,
                     outline: "none"
