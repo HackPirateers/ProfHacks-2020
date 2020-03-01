@@ -64,8 +64,13 @@ class Test(Resource):
 
         #print(listCountries[0])
         #print(type(listCountriesSum[0]))
-        #change inddex for country
-        testin = dictOfCountries.get(args.list[1])
+        #change inddex for country#
+        #set to 1 until push from aditya
+        testin = dictOfCountries.get(args.list[0])
+        if testin is None:
+            data999 = ["Not enough data"]
+            x = {'output': data999}
+            return x
         # print(listCountriesSum[testin])
         # print(range(1, len(listCountriesSum[testin].columns)))
 
